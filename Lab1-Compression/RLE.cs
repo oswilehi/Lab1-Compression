@@ -13,9 +13,9 @@ namespace Lab1_Compression
         /// This method compress a file with the RLE method
         /// </summary>
         /// <param name="pathFileToCompress"></param>
-        public static void compression(string pathFileToCompress)
+        public  void compression(string pathFileToCompress)
         {
-            StreamWriter outputfile = new StreamWriter(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.GetFileNameWithoutExtension(pathFileToCompress)));
+            StreamWriter outputfile = new StreamWriter(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.GetFileNameWithoutExtension(pathFileToCompress) + ".rlex"));
             outputfile.WriteLine("0," + Path.GetFileName(pathFileToCompress));
             outputfile.Flush();
             outputfile.Close();
@@ -35,7 +35,7 @@ namespace Lab1_Compression
                         else
                         {
                             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.GetFileNameWithoutExtension(pathFileToCompress));
-                            using (var outputFile = new FileStream(path + ".comp", FileMode.Append))
+                            using (var outputFile = new FileStream(path + ".rlex", FileMode.Append))
                             {
                                 using (var writer = new BinaryWriter(outputFile, Encoding.ASCII))
                                 {
@@ -57,7 +57,7 @@ namespace Lab1_Compression
         /// This method decompress a file that was compressed by RLE method
         /// </summary>
         /// <param name="filepath"></param>
-        public static void decompression(string filepath)
+        public  void decompression(string filepath)
         {
             StreamReader reader1 = new StreamReader(filepath);
             string firstLine = reader1.ReadLine();

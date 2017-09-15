@@ -42,17 +42,25 @@ namespace Lab1_Compression
                             Console.WriteLine("-Porcentaje ahorrado: " + RLE.savingPercentage().ToString() + "%\n\n");
                             break;
                         case "-c1":
-                            huffman = new Huffman(filePath);
+                            huffman = new Huffman();
+                            huffman.ReadFrequencies(filePath); // Este es el que comprime
                             messageC();
                             Console.WriteLine("\nEstadísticas del archivo generado:");
-                            Console.WriteLine("-Tamaño original: " + RLE.sizeOriginalSize);
-                            Console.WriteLine("-Tamaño final: " + RLE.sizeCompressedFile);
-                            Console.WriteLine("-Ratio de compresión: " + RLE.compressionRatio().ToString());
-                            Console.WriteLine("-Factor de compresión: " + RLE.compressionFactor().ToString());
-                            Console.WriteLine("-Porcentaje ahorrado: " + RLE.savingPercentage().ToString() + "%\n\n");
+                            Console.WriteLine("\n\n");
                             break;
                         case "-d":
-                            RLE.decompression(filePath);
+                            StreamReader reader = new StreamReader(filePath);
+                            string line = reader.ReadLine();
+                            var methodOfCompression = line.Split(',');
+                            reader.Close();
+                            if (int.Parse(methodOfCompression[0]) == 0)
+                                RLE.decompression(filePath);
+                            else
+                            {
+                                huffman = new Huffman();
+                                huffman.Decompress(filePath);
+                            }
+
                             messageD();
                             break;
                         case "exit":

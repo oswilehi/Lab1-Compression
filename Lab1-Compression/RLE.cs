@@ -17,7 +17,7 @@ namespace Lab1_Compression
         /// <param name="pathFileToCompress"></param>
         public static void compression(string pathFileToCompress)
         {
-            StreamWriter outputfile = new StreamWriter(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.GetFileNameWithoutExtension(pathFileToCompress)));
+            StreamWriter outputfile = new StreamWriter(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.GetFileNameWithoutExtension(pathFileToCompress)) + ".comp");
             outputfile.WriteLine("0," + Path.GetFileName(pathFileToCompress));
             outputfile.Flush();
             outputfile.Close();
@@ -102,10 +102,10 @@ namespace Lab1_Compression
         /// Gives the ratio of compression
         /// </summary>
         /// <returns></returns>
-        public static int compressionRatio()
+        public static double compressionRatio()
         {
-            int sizeAfter = sizeCompressedFile;
-            int sizeBefore = sizeOriginalSize;
+            double sizeAfter = sizeCompressedFile;
+            double sizeBefore = sizeOriginalSize;
             return sizeAfter / sizeBefore;
         }
 
@@ -113,10 +113,10 @@ namespace Lab1_Compression
         /// Gives the compression factor
         /// </summary>
         /// <returns></returns>
-        public static int compressionFactor()
+        public static double compressionFactor()
         {
-            int sizeAfter = sizeCompressedFile;
-            int sizeBefore = sizeOriginalSize;
+            double sizeAfter = sizeCompressedFile;
+            double sizeBefore = sizeOriginalSize;
             return sizeBefore / sizeAfter;
         }
 

@@ -20,11 +20,11 @@ namespace Lab1_Compression
         /// Constructor
         /// </summary>
         /// <param name="filePath">File path</param>
-        public Huffman(string filePath)
+        public Huffman()
         {
             root = null;
             frequencies = new Dictionary<char, int>();
-            ReadFrequencies(filePath);
+
 
         }
         /// <summary>
@@ -32,12 +32,13 @@ namespace Lab1_Compression
         /// </summary>
         /// <param name="filepath">File path</param>
         /// <param name="bytes">File byte array</param>
-        private void compression(string filepath, byte[] bytes)
+        public void compression(string filepath, byte[] bytes)
         {
-            StreamWriter file = new StreamWriter("C:\\Users\\Oscar\\Desktop\\LAB1.txt" + ".comp");
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.GetFileNameWithoutExtension(filepath) + ".comp");
+            StreamWriter file = new StreamWriter(path);
             file.WriteLine("1," + Path.GetFileName(filepath));
-            Dictionary<byte, string> encode = PrefixCode();
-            foreach (KeyValuePair<byte, string> item in encode)
+            Dictionary<char, string> encode = PrefixCode();
+            foreach (KeyValuePair<char, string> item in encode)
             {
                 file.Write((byte)item.Key);
                 file.Write('-');
@@ -47,14 +48,14 @@ namespace Lab1_Compression
             file.WriteLine();
             file.Flush();
             file.Close();
-            using (var outputFile = new FileStream("C:\\Users\\Oscar\\Desktop\\LAB1.txt" + ".comp", FileMode.Append))
+            using (var outputFile = new FileStream(path, FileMode.Append))
             {
                 using (var writer = new BinaryWriter(outputFile, Encoding.ASCII))
                 {
                     string pivot = "";
                     for (int i = 0; i < bytes.Length; i++)
                     {
-                        pivot += encode[bytes[i]];
+                        pivot += encode[(char)bytes[i]];
                     }
                     lengthOfPrefixCodes = pivot.Length;
                     var bit = 0;
@@ -85,7 +86,7 @@ namespace Lab1_Compression
         /// Creat a dictionary (char,int) with the frequencies of each character
         /// </summary>
         /// <param name="filepath"></param>
-        private void ReadFrequencies(string filepath)
+        public void ReadFrequencies(string filepath)
         {
             using (var file = new FileStream(filepath, FileMode.Open))
             {
@@ -149,9 +150,9 @@ namespace Lab1_Compression
         /// Dictionary with the prefix code and the characters
         /// </summary>
         /// <returns></returns>
-        private Dictionary<byte, string> PrefixCode()
+        private Dictionary<char, string> PrefixCode()
         {
-            Dictionary<byte, string> prefixcode = new Dictionary<byte, string>();
+            Dictionary<char, string> prefixcode = new Dictionary<char, string>();
             Encode(root, prefixcode, "");
             return prefixcode;
         }
@@ -161,7 +162,7 @@ namespace Lab1_Compression
         /// <param name="node">Root</param>
         /// <param name="prefixcode"></param>
         /// <param name="prefix"></param>
-        private void Encode(HuffmanNode node, Dictionary<byte, string> prefixcode, string prefix)
+        private void Encode(HuffmanNode node, Dictionary<char, string> prefixcode, string prefix)
         {
             if (node.left != null)
             {
@@ -169,7 +170,7 @@ namespace Lab1_Compression
                 Encode(node.right, prefixcode, prefix + "1");
             }
             else
-                prefixcode.Add((byte)node.value, prefix);
+                prefixcode.Add((char)node.value, prefix);
         }
 
         public void Decompress(string path)

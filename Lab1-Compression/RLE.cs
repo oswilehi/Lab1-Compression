@@ -9,8 +9,8 @@ namespace Lab1_Compression
 {
     class RLE
     {
-        private static int sizeCompressedFile { get; set; }
-        private static int sizeOriginalSize { get; set; }
+        public static int sizeCompressedFile { get; set; }
+        public static int sizeOriginalSize { get; set; }
         /// <summary>
         /// This method compress a file with the RLE method
         /// </summary>

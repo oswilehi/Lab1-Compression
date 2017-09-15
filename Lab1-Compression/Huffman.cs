@@ -20,13 +20,18 @@ namespace Lab1_Compression
         /// Constructor
         /// </summary>
         /// <param name="filePath">File path</param>
-        public Huffman(string filePath)
+        public Huffman()
         {
             root = null;
             frequencies = new Dictionary<char, int>();
-            ReadFrequencies(filePath);
+           
 
         }
+        public void Compression(string filePath)
+        {
+            ReadFrequencies(filePath);
+        }
+       
         /// <summary>
         /// Method to compress file
         /// </summary>

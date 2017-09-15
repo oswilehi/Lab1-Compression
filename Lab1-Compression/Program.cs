@@ -14,7 +14,7 @@ namespace Lab1_Compression
             string entry = "", filePath = "", type = "";
             bool exit = true;
 
-            Huffman huffman;
+            Huffman huffman = new Huffman();
             while (exit)
             {
                 Console.WriteLine("Para realizar la compresión con el algoritmo huffman escriba 1 o 0 para el RLE después del comando '-c'.\nSin espacios de por medio; ejemplo: -c1");
@@ -42,7 +42,7 @@ namespace Lab1_Compression
                             Console.WriteLine("-Porcentaje ahorrado: " + RLE.savingPercentage().ToString() + "%\n\n");
                             break;
                         case "-c1":
-                            huffman = new Huffman(filePath);
+                            huffman.Compression(filePath);
                             messageC();
                             Console.WriteLine("\nEstadísticas del archivo generado:");
                             Console.WriteLine("-Tamaño original: " + RLE.sizeOriginalSize);
@@ -53,6 +53,7 @@ namespace Lab1_Compression
                             break;
                         case "-d":
                             RLE.decompression(filePath);
+                            huffman.Decompress(filePath);
                             messageD();
                             break;
                         case "exit":

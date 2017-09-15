@@ -33,37 +33,40 @@ namespace Lab1_Compression
         /// <param name="bytes">File byte array</param>
         private void compression(string filepath, byte[] bytes)
         {
-            StreamWriter file = new StreamWriter("C:\\Users\\jsala\\Desktop\\prueba2.txt" + ".comp");
+            //escribir el encabezado: 1 = algoritmo huffman, nombre del archivo
+            StreamWriter file = new StreamWriter(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.GetFileName(filepath) + ".comp"));
             file.WriteLine("1," + Path.GetFileName(filepath));
-            Dictionary<char, string> encode = PrefixCode();
-            foreach (KeyValuePair<char, string> item in encode)
+            Dictionary<char, string> encode = PrefixCode(); //diccionario que contiene los caracteres y el codigo prefijo de cada uno
+            foreach (KeyValuePair<char, string> item in encode) //escribo en el archivo el caracter y el código prefijo para que pueda ser descomprimido despues
             {
+                //formato: s-001|
                 file.Write(item.Key);
                 file.Write('-');
                 file.Write(item.Value);
                 file.Write('|');
                 
             }
-            file.WriteLine();
+            file.WriteLine(); //salto de línea
             file.Flush();
             file.Close();
-            using (var outputFile = new FileStream("C:\\Users\\jsala\\Desktop\\prueba2.txt" + ".comp", FileMode.Append))
+            //creo el archivo de salida para escribirlo en ascii
+            using (var outputFile = new FileStream(filepath + ".comp", FileMode.Append))
             {
                 using (var writer = new BinaryWriter(outputFile, Encoding.ASCII))
                 {
-                    string pivot = "";
+                    string pivot = ""; //va a contener la información de todo el archivo comprimido
                     for (int i = 0; i < bytes.Length; i++)
                     {
-                        pivot += encode[(char)bytes[i]];
+                        pivot += encode[(char)bytes[i]]; 
                     }
                     var bit = 0;
 
-                    for (int i = 0; i < pivot.Length; i++)
+                    for (int i = 0; i < pivot.Length; i++) //escribo en el archivo
                     {
                         if (pivot.Length - i > 8)
                         {
                             string current = pivot.Substring(i, 8);
-                            bit = Convert.ToInt16(current, 2);
+                            bit = Convert.ToInt16(current, 2); //convierto a binario los 8 bits que tomo del 'pivot'
                             i = i + 7;
                         }
                         else
@@ -73,9 +76,9 @@ namespace Lab1_Compression
                             i = pivot.Length;
                         }
                         
-                        var bits = int.Parse(bit.ToString());
+                        var bits = int.Parse(bit.ToString()); //convierto a int el binario obtenido previamente
                       
-                        writer.Write(bits);
+                        writer.Write(bits); //escribo en el archivo
                     }
 
                 }
@@ -87,21 +90,21 @@ namespace Lab1_Compression
         /// <param name="filepath"></param>
         private void ReadFrequencies(string filepath)
         {
-            using (var file = new FileStream(filepath, FileMode.Open))
+            using (var file = new FileStream(filepath, FileMode.Open)) 
             {
                 using (var binaryFile = new BinaryReader(file))
                 {
                     var bytes = binaryFile.ReadBytes((int)file.Length);
-                    fileSize = (int)file.Length;
+                    fileSize = (int)file.Length; //asigno el length al atributo fileSize de la clase
                     for (int i = 0; i < bytes.Length; i++)
                     {
-                        if (!frequencies.ContainsKey((char)bytes[i]))
+                        if (!frequencies.ContainsKey((char)bytes[i])) //si en el diccionario "frequencies" no está el caracter actual lo añade
                             frequencies.Add((char)bytes[i], 0);
-                        frequencies[(char)bytes[i]]++;
+                        frequencies[(char)bytes[i]]++; // si se encuentra dentro del diccionario, incrementa su frecuencia/probabilidad
 
                     }
-                    HuffmanTree(frequencies);
-                    compression(filepath, bytes);
+                    HuffmanTree(frequencies); //crea el árbol con el algoritmo de huffman
+                    compression(filepath, bytes); // comprime el archivo
                 }
             }
         }
@@ -121,24 +124,29 @@ namespace Lab1_Compression
         /// <param name="frequencies">Dictionary of frequencies</param>
         private void HuffmanTree(IEnumerable<KeyValuePair<char, int>> frequencies)
         {
-            HuffmanQueue<HuffmanNode> priorityQueue = new HuffmanQueue<HuffmanNode>();
+            HuffmanQueue<HuffmanNode> priorityQueue = new HuffmanQueue<HuffmanNode>(); //cola de probabilidades la cual siempre irá de menor a mayor (por ello el nombre priority)
 
-            foreach (KeyValuePair<char, int> item in frequencies)
+            foreach (KeyValuePair<char, int> item in frequencies) //añado los elementos del diccionario "frequencies" a la cola 
             {
                 priorityQueue.Queue(new HuffmanNode { value = item.Key, probability = GetProbability(item.Value) }, GetProbability(item.Value));
             }
             while (priorityQueue.Count > 1)
             {
-                HuffmanNode n1 = priorityQueue.Dequeue();
-                HuffmanNode n2 = priorityQueue.Dequeue();
-                HuffmanNode newNode = new HuffmanNode { left = n1, right = n2, probability = SumOfProbabilities(n1.probability, n2.probability) };
-                n1.parent = newNode;
+                HuffmanNode n1 = priorityQueue.Dequeue(); //elimina el primer elemento de la cola (siempre será el de menor probabilidad)
+                HuffmanNode n2 = priorityQueue.Dequeue(); //elimina el segundo elemento de la cola (tendra la misma o mayor probabilidad que el anterior)
+                HuffmanNode newNode = new HuffmanNode { left = n1, right = n2, probability = SumOfProbabilities(n1.probability, n2.probability) }; //crea un nuevo nodo con la suma de ambas probabilidades
+                n1.parent = newNode; // se le asigna a los 2 nodos de la tabla de frecuencia el nuevo nodo como padre
                 n2.parent = newNode;
-                priorityQueue.Queue(newNode, newNode.probability);
+                priorityQueue.Queue(newNode, newNode.probability); //se añade el nuevo nodo a la cola de prioridad para repetir el algoritmo hasta que el tamaño de la cola sea 1
             }
-            root = priorityQueue.Dequeue();
+            root = priorityQueue.Dequeue(); //se asigna el último elemento de la cola de prioridad al nodo root, el cual deberá tener una probabilidad de 1
 
         }
+        /// <summary>
+        /// Get the probability of a character
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         private double GetProbability(int value)
         {
             double v = value;
@@ -151,7 +159,7 @@ namespace Lab1_Compression
         /// <returns></returns>
         private Dictionary<char, string> PrefixCode()
         {
-            Dictionary<char, string> prefixcode = new Dictionary<char, string>();
+            Dictionary<char, string> prefixcode = new Dictionary<char, string>(); //diccionario de caracteres con su código prefijo
             Encode(root, prefixcode, "");
             return prefixcode;
         }
@@ -165,11 +173,11 @@ namespace Lab1_Compression
         {
             if (node.left != null)
             {
-                Encode(node.left, prefixcode, prefix + "0");
-                Encode(node.right, prefixcode, prefix + "1");
+                Encode(node.left, prefixcode, prefix + "0"); //concatena 0 si es a la izquierda
+                Encode(node.right, prefixcode, prefix + "1"); //concatena 1 si es a la derecha
             }
             else
-                prefixcode.Add(node.value, prefix);
+                prefixcode.Add(node.value, prefix); //nodo hoja
         }
     }
 }

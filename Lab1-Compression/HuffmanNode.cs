@@ -9,11 +9,11 @@ namespace Lab1_Compression
     class HuffmanNode
     {
         //Atributes
-        public double probability { get; set; }
-        public char value { get; set; }
-        public HuffmanNode right { get; set; }
-        public HuffmanNode left { get; set; }
-        public HuffmanNode parent { get; set; }
+        public double probability { get; set; } //probabilidad de repetirse dentro del documento 
+        public char value { get; set; } //caracter especial
+        public HuffmanNode right { get; set; } // nodo derecho
+        public HuffmanNode left { get; set; } //nodo izquiero
+        public HuffmanNode parent { get; set; } //nodo padre
 
         //Constructor
         public HuffmanNode()

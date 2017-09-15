@@ -23,7 +23,7 @@ namespace Lab1_Compression
         {
             root = null;
             frequencies = new Dictionary<char, int>();
-            ReadFrequencies(filePath);
+            ReadFrequencies(filePath); //creat the dictionary with the frequency of each character
 
         }
         /// <summary>
@@ -33,6 +33,7 @@ namespace Lab1_Compression
         /// <param name="bytes">File byte array</param>
         private void compression(string filepath, byte[] bytes)
         {
+            //header : 1 = huffman algorithm, file name
             StreamWriter file = new StreamWriter(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.GetFileNameWithoutExtension(filepath)));
             file.WriteLine("1," + Path.GetFileName(filepath));
            
@@ -43,40 +44,38 @@ namespace Lab1_Compression
             {
                 using (var writer = new BinaryWriter(outputFile, Encoding.ASCII))
                 {
-                    Dictionary<char, string> encode = PrefixCode();
-                    StringBuilder content = new StringBuilder();
+                    Dictionary<char, string> encode = PrefixCode(); //dictionary value - prefix code to compress the file
                     string pivot = "";
                     for (int i = 0; i < bytes.Length; i++)
                     {
-                        pivot += encode[(char)bytes[i]];
+                        pivot += encode[(char)bytes[i]]; //compress data 
                     }
 
                     //write prefix table
                     foreach (KeyValuePair<char, string> item in encode)
                     {
-                        writer.Write(item.Key + '|' + item.Value);
+                        writer.Write(item.Key + ',' + item.Value);
                     }
-                    writer.Write('|' + '|' + '|');
-                    int bit;
-
+                    //write the compressed document in the file
+                    var bit = 0;
                     for (int i = 0; i < pivot.Length; i++)
                     {
-                        if (i < pivot.Length)
+                        if (pivot.Length - i > 8)
                         {
-                            bit = int.Parse(pivot.Substring(i, 8));
+                            string current = pivot.Substring(i, 8); //group of 8 bits from the original file
+                            bit = Convert.ToInt16(current, 2); // convert to binary 
                             i = i + 7;
                         }
                         else
-                            bit = int.Parse(pivot.Substring(i, pivot.Length));
-                        var bits = (char)bit;
-                        if (bits > 255)
                         {
-                            int div = bits / 256;
-                            int mod = bits % 256;
+                            string current = pivot.Substring(i, (pivot.Length - i));
+                            bit = Convert.ToInt16(current, 2);
+                            i = pivot.Length;
                         }
+                        var bits = int.Parse(bit.ToString()); //convert to int and write the value in the file
                         writer.Write(bits);
-                    }
 
+                    }
                 }
             }
         }
@@ -159,7 +158,7 @@ namespace Lab1_Compression
         {
             if (node.left != null)
             {
-                Encode(node.left, prefixcode, prefix + "0");
+                Encode(node.left, prefixcode, prefix + "0"); 
                 Encode(node.right, prefixcode, prefix + "1");
             }
             else

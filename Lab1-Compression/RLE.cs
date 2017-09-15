@@ -9,6 +9,8 @@ namespace Lab1_Compression
 {
     class RLE
     {
+        private static int sizeCompressedFile { get; set; }
+        private static int sizeOriginalSize { get; set; }
         /// <summary>
         /// This method compress a file with the RLE method
         /// </summary>
@@ -21,6 +23,7 @@ namespace Lab1_Compression
             outputfile.Close();
             using (var file = new FileStream(pathFileToCompress, FileMode.Open))
             {
+                sizeOriginalSize = (int)file.Length;
                 using (var reader = new BinaryReader(file))
                 {
                     var bytes = reader.ReadBytes((int)file.Length);
@@ -67,10 +70,9 @@ namespace Lab1_Compression
             reader1.Close();
             using (var file = new FileStream(filepath, FileMode.Open))
             {
-
+                sizeCompressedFile = (int)file.Length;
                 using (var currentFile = new BinaryReader(file))
                 {
-
                     var bytes = currentFile.ReadBytes((int)file.Length);
                     int count = 0;
                     string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
@@ -92,10 +94,41 @@ namespace Lab1_Compression
 
                         }
                     }
-
-
                 }
             }
+        }
+
+        /// <summary>
+        /// Gives the ratio of compression
+        /// </summary>
+        /// <returns></returns>
+        public static int compressionRatio()
+        {
+            int sizeAfter = sizeCompressedFile;
+            int sizeBefore = sizeOriginalSize;
+            return sizeAfter / sizeBefore;
+        }
+
+        /// <summary>
+        /// Gives the compression factor
+        /// </summary>
+        /// <returns></returns>
+        public static int compressionFactor()
+        {
+            int sizeAfter = sizeCompressedFile;
+            int sizeBefore = sizeOriginalSize;
+            return sizeBefore / sizeAfter;
+        }
+
+        /// <summary>
+        /// Gives the saving percentage
+        /// </summary>
+        /// <returns></returns>
+        public static double savingPercentage()
+        {
+            int sizeAfter = sizeCompressedFile;
+            int sizeBefore = sizeOriginalSize;
+            return (sizeBefore - sizeAfter) / sizeBefore * 100;
         }
 
 

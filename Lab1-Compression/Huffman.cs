@@ -23,7 +23,7 @@ namespace Lab1_Compression
         {
             root = null;
             frequencies = new Dictionary<char, int>();
-            ReadFrequencies(filePath); //creat the dictionary with the frequency of each character
+            ReadFrequencies(filePath);
 
         }
         /// <summary>
@@ -33,37 +33,37 @@ namespace Lab1_Compression
         /// <param name="bytes">File byte array</param>
         private void compression(string filepath, byte[] bytes)
         {
-            //header : 1 = huffman algorithm, file name
-            StreamWriter file = new StreamWriter(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.GetFileNameWithoutExtension(filepath)));
+            StreamWriter file = new StreamWriter("C:\\Users\\jsala\\Desktop\\prueba2.txt" + ".comp");
             file.WriteLine("1," + Path.GetFileName(filepath));
-           
+            Dictionary<char, string> encode = PrefixCode();
+            foreach (KeyValuePair<char, string> item in encode)
+            {
+                file.Write(item.Key);
+                file.Write('-');
+                file.Write(item.Value);
+                file.Write('|');
+                
+            }
+            file.WriteLine();
             file.Flush();
             file.Close();
-
             using (var outputFile = new FileStream("C:\\Users\\jsala\\Desktop\\prueba2.txt" + ".comp", FileMode.Append))
             {
                 using (var writer = new BinaryWriter(outputFile, Encoding.ASCII))
                 {
-                    Dictionary<char, string> encode = PrefixCode(); //dictionary value - prefix code to compress the file
                     string pivot = "";
                     for (int i = 0; i < bytes.Length; i++)
                     {
-                        pivot += encode[(char)bytes[i]]; //compress data 
+                        pivot += encode[(char)bytes[i]];
                     }
-
-                    //write prefix table
-                    foreach (KeyValuePair<char, string> item in encode)
-                    {
-                        writer.Write(item.Key + ',' + item.Value);
-                    }
-                    //write the compressed document in the file
                     var bit = 0;
+
                     for (int i = 0; i < pivot.Length; i++)
                     {
                         if (pivot.Length - i > 8)
                         {
-                            string current = pivot.Substring(i, 8); //group of 8 bits from the original file
-                            bit = Convert.ToInt16(current, 2); // convert to binary 
+                            string current = pivot.Substring(i, 8);
+                            bit = Convert.ToInt16(current, 2);
                             i = i + 7;
                         }
                         else
@@ -72,10 +72,12 @@ namespace Lab1_Compression
                             bit = Convert.ToInt16(current, 2);
                             i = pivot.Length;
                         }
-                        var bits = int.Parse(bit.ToString()); //convert to int and write the value in the file
+                        
+                        var bits = int.Parse(bit.ToString());
+                      
                         writer.Write(bits);
-
                     }
+
                 }
             }
         }
@@ -104,16 +106,14 @@ namespace Lab1_Compression
             }
         }
         /// <summary>
-        /// Get the probability 
+        /// Get the add of two probabilities
         /// </summary>
         /// <param name="n1">frequency number one</param>
         /// <param name="n2">frequency number one</param>
         /// <returns>The sum of both frequencies</returns>
         private double SumOfProbabilities(double n1, double n2)
         {
-            double r1 = n1 / fileSize;
-            double r2 = n2 / fileSize;
-            return r1 + r2;
+            return n1 + n2;
         }
         /// <summary>
         /// Creat Huffman tree 
@@ -122,9 +122,10 @@ namespace Lab1_Compression
         private void HuffmanTree(IEnumerable<KeyValuePair<char, int>> frequencies)
         {
             HuffmanQueue<HuffmanNode> priorityQueue = new HuffmanQueue<HuffmanNode>();
+
             foreach (KeyValuePair<char, int> item in frequencies)
             {
-                priorityQueue.Queue(new HuffmanNode { value = item.Key, probability = item.Value }, item.Value);
+                priorityQueue.Queue(new HuffmanNode { value = item.Key, probability = GetProbability(item.Value) }, GetProbability(item.Value));
             }
             while (priorityQueue.Count > 1)
             {
@@ -137,6 +138,12 @@ namespace Lab1_Compression
             }
             root = priorityQueue.Dequeue();
 
+        }
+        private double GetProbability(int value)
+        {
+            double v = value;
+            double s = fileSize;
+            return v / s;
         }
         /// <summary>
         /// Dictionary with the prefix code and the characters
@@ -158,7 +165,7 @@ namespace Lab1_Compression
         {
             if (node.left != null)
             {
-                Encode(node.left, prefixcode, prefix + "0"); 
+                Encode(node.left, prefixcode, prefix + "0");
                 Encode(node.right, prefixcode, prefix + "1");
             }
             else

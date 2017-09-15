@@ -10,6 +10,9 @@ namespace Lab1_Compression
     {
         static void Main(string[] args)
         {
+            Huffman huffman = new Huffman("C:\\Users\\Oscar\\Desktop\\LAB1.txt");
+
+            huffman.Decompress("C:\\Users\\Oscar\\Desktop\\LAB1.txt.comp");
         }
     }
 }

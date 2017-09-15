@@ -15,6 +15,7 @@ namespace Lab1_Compression
         private HuffmanNode root;
         private int fileSize;
         private Dictionary<char, int> frequencies;
+        private int lengthOfPrefixCodes;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -33,34 +34,34 @@ namespace Lab1_Compression
         /// <param name="bytes">File byte array</param>
         private void compression(string filepath, byte[] bytes)
         {
-            StreamWriter file = new StreamWriter("C:\\Users\\jsala\\Desktop\\prueba2.txt" + ".comp");
+            StreamWriter file = new StreamWriter("C:\\Users\\Oscar\\Desktop\\LAB1.txt" + ".comp");
             file.WriteLine("1," + Path.GetFileName(filepath));
-            Dictionary<char, string> encode = PrefixCode();
-            foreach (KeyValuePair<char, string> item in encode)
+            Dictionary<byte, string> encode = PrefixCode();
+            foreach (KeyValuePair<byte, string> item in encode)
             {
-                file.Write(item.Key);
+                file.Write((byte)item.Key);
                 file.Write('-');
                 file.Write(item.Value);
                 file.Write('|');
-                
             }
             file.WriteLine();
             file.Flush();
             file.Close();
-            using (var outputFile = new FileStream("C:\\Users\\jsala\\Desktop\\prueba2.txt" + ".comp", FileMode.Append))
+            using (var outputFile = new FileStream("C:\\Users\\Oscar\\Desktop\\LAB1.txt" + ".comp", FileMode.Append))
             {
                 using (var writer = new BinaryWriter(outputFile, Encoding.ASCII))
                 {
                     string pivot = "";
                     for (int i = 0; i < bytes.Length; i++)
                     {
-                        pivot += encode[(char)bytes[i]];
+                        pivot += encode[bytes[i]];
                     }
+                    lengthOfPrefixCodes = pivot.Length;
                     var bit = 0;
 
                     for (int i = 0; i < pivot.Length; i++)
                     {
-                        if (pivot.Length - i > 8)
+                        if (pivot.Length - i >= 8)
                         {
                             string current = pivot.Substring(i, 8);
                             bit = Convert.ToInt16(current, 2);
@@ -68,13 +69,12 @@ namespace Lab1_Compression
                         }
                         else
                         {
-                            string current = pivot.Substring(i, (pivot.Length - i));
+                            string current = pivot.Substring(i, (pivot.Length % 8));
                             bit = Convert.ToInt16(current, 2);
                             i = pivot.Length;
                         }
-                        
-                        var bits = int.Parse(bit.ToString());
-                      
+
+                        byte bits = (byte)int.Parse(bit.ToString());
                         writer.Write(bits);
                     }
 
@@ -149,9 +149,9 @@ namespace Lab1_Compression
         /// Dictionary with the prefix code and the characters
         /// </summary>
         /// <returns></returns>
-        private Dictionary<char, string> PrefixCode()
+        private Dictionary<byte, string> PrefixCode()
         {
-            Dictionary<char, string> prefixcode = new Dictionary<char, string>();
+            Dictionary<byte, string> prefixcode = new Dictionary<byte, string>();
             Encode(root, prefixcode, "");
             return prefixcode;
         }
@@ -161,7 +161,7 @@ namespace Lab1_Compression
         /// <param name="node">Root</param>
         /// <param name="prefixcode"></param>
         /// <param name="prefix"></param>
-        private void Encode(HuffmanNode node, Dictionary<char, string> prefixcode, string prefix)
+        private void Encode(HuffmanNode node, Dictionary<byte, string> prefixcode, string prefix)
         {
             if (node.left != null)
             {
@@ -169,7 +169,71 @@ namespace Lab1_Compression
                 Encode(node.right, prefixcode, prefix + "1");
             }
             else
-                prefixcode.Add(node.value, prefix);
+                prefixcode.Add((byte)node.value, prefix);
         }
+
+        public void Decompress(string path)
+        {
+            Dictionary<string, int> prefijos = new Dictionary<string, int>();
+            StreamReader reader = new StreamReader(path);
+            string firstLine = reader.ReadLine();
+            var infoOfFile = firstLine.Split(',');
+            string fileName = infoOfFile[1];
+            string secondLine = reader.ReadLine();
+            secondLine = secondLine.TrimEnd('|');
+            var separatedSecondLine = secondLine.Split('|');
+            int sizeToJump = firstLine.Length + secondLine.Length + 4 /* Ese cuatro es por los dos saltos de lineas y los dos enters*/ + 1 /* y ese uno es por el palito que se quita del final*/;
+
+            string fileInBinary = "";
+
+
+            for (int i = 0; i < separatedSecondLine.Length; i++)
+            {
+                var valueAndPrefix = separatedSecondLine[i].Split('-');
+                int value = int.Parse(valueAndPrefix[0]);
+                string prefix = valueAndPrefix[1];
+                prefijos[prefix] = value;
+            }
+
+            reader.Close();
+
+            using (var file = new FileStream(path, FileMode.Open))
+            {
+                using (var currentFile = new BinaryReader(file))
+                {
+                    var bytes = currentFile.ReadBytes((int)file.Length);
+
+                    for (int i = sizeToJump; i < bytes.Length; i++)
+                    {
+                        string partOfFile = Convert.ToString(bytes[i], 2);
+                        if (partOfFile.Length < 8 && i != bytes.Length - 1)
+                            partOfFile = partOfFile.PadLeft(8, '0');
+                        else if (i == bytes.Length - 1)
+                            partOfFile = partOfFile.PadLeft(lengthOfPrefixCodes % 8, '0');
+                        fileInBinary += partOfFile;
+                    }
+                }
+            }
+
+            string pathToSave = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
+            using (StreamWriter outputFile = new StreamWriter(pathToSave + "\\D" + fileName))
+            {
+                    int start = 0;
+                    for (int i = 0; i <= fileInBinary.Length; i++)
+                    {
+
+                        if (prefijos.ContainsKey(fileInBinary.Substring(0, i)))
+                        {
+                            outputFile.Write((char)prefijos[fileInBinary.Substring(0, i)]);
+                            fileInBinary = fileInBinary.Remove(start, i);
+                            i = 0;
+                        }
+                    }
+            }
+
+        }
+
     }
 }
+
+

@@ -9,15 +9,15 @@ namespace Lab1_Compression
 {
     class RLE
     {
-        private static int sizeCompressedFile { get; set; }
-        private static int sizeOriginalSize { get; set; }
+        public int sizeCompressedFile { get; set; }
+        public int sizeOriginalSize { get; set; }
         /// <summary>
         /// This method compress a file with the RLE method
         /// </summary>
         /// <param name="pathFileToCompress"></param>
-        public static void compression(string pathFileToCompress)
+        public  void compression(string pathFileToCompress)
         {
-            StreamWriter outputfile = new StreamWriter(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.GetFileNameWithoutExtension(pathFileToCompress)));
+            StreamWriter outputfile = new StreamWriter(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.GetFileNameWithoutExtension(pathFileToCompress)+ ".comp"));
             outputfile.WriteLine("0," + Path.GetFileName(pathFileToCompress));
             outputfile.Flush();
             outputfile.Close();
@@ -47,6 +47,7 @@ namespace Lab1_Compression
                                     writer.Write(bytes[i]);
                                     counterOfEquals = 1;
                                 }
+                                sizeCompressedFile = (int)outputFile.Length;
                             }
 
                         }
@@ -60,7 +61,7 @@ namespace Lab1_Compression
         /// This method decompress a file that was compressed by RLE method
         /// </summary>
         /// <param name="filepath"></param>
-        public static void decompression(string filepath)
+        public void decompression(string filepath)
         {
             StreamReader reader1 = new StreamReader(filepath);
             string firstLine = reader1.ReadLine();
@@ -70,7 +71,7 @@ namespace Lab1_Compression
             reader1.Close();
             using (var file = new FileStream(filepath, FileMode.Open))
             {
-                sizeCompressedFile = (int)file.Length;
+               
                 using (var currentFile = new BinaryReader(file))
                 {
                     var bytes = currentFile.ReadBytes((int)file.Length);
@@ -102,10 +103,10 @@ namespace Lab1_Compression
         /// Gives the ratio of compression
         /// </summary>
         /// <returns></returns>
-        public static int compressionRatio()
+        public double compressionRatio()
         {
-            int sizeAfter = sizeCompressedFile;
-            int sizeBefore = sizeOriginalSize;
+            double sizeAfter = sizeCompressedFile;
+            double sizeBefore = sizeOriginalSize;
             return sizeAfter / sizeBefore;
         }
 
@@ -113,10 +114,10 @@ namespace Lab1_Compression
         /// Gives the compression factor
         /// </summary>
         /// <returns></returns>
-        public static int compressionFactor()
+        public double compressionFactor()
         {
-            int sizeAfter = sizeCompressedFile;
-            int sizeBefore = sizeOriginalSize;
+            double sizeAfter = sizeCompressedFile;
+            double sizeBefore = sizeOriginalSize;
             return sizeBefore / sizeAfter;
         }
 
@@ -124,10 +125,10 @@ namespace Lab1_Compression
         /// Gives the saving percentage
         /// </summary>
         /// <returns></returns>
-        public static double savingPercentage()
+        public double savingPercentage()
         {
-            int sizeAfter = sizeCompressedFile;
-            int sizeBefore = sizeOriginalSize;
+            double sizeAfter = sizeCompressedFile;
+            double sizeBefore = sizeOriginalSize;
             return (sizeBefore - sizeAfter) / sizeBefore * 100;
         }
 

@@ -34,7 +34,7 @@ namespace Lab1_Compression
                         case "-c0":
                             RLE.compression(filePath);
                             messageC();
-                            Console.WriteLine("\nEstadísticas del archivo generado:");
+                            Console.WriteLine("\nEstadísticas del archivo generado con RLE:");
                             Console.WriteLine("-Tamaño original: " + RLE.sizeOriginalSize);
                             Console.WriteLine("-Tamaño final: " + RLE.sizeCompressedFile);
                             Console.WriteLine("-Ratio de compresión: " + RLE.compressionRatio().ToString());
@@ -44,12 +44,12 @@ namespace Lab1_Compression
                         case "-c1":
                             huffman.Compression(filePath);
                             messageC();
-                            Console.WriteLine("\nEstadísticas del archivo generado:");
-                            Console.WriteLine("-Tamaño original: " + RLE.sizeOriginalSize);
-                            Console.WriteLine("-Tamaño final: " + RLE.sizeCompressedFile);
-                            Console.WriteLine("-Ratio de compresión: " + RLE.compressionRatio().ToString());
-                            Console.WriteLine("-Factor de compresión: " + RLE.compressionFactor().ToString());
-                            Console.WriteLine("-Porcentaje ahorrado: " + RLE.savingPercentage().ToString() + "%\n\n");
+                            Console.WriteLine("\nEstadísticas del archivo generado con Huffman:");
+                            Console.WriteLine("-Tamaño original: " + huffman.sizeOriginalSize);
+                            Console.WriteLine("-Tamaño final: " + huffman.sizeCompressedFile);
+                            Console.WriteLine("-Ratio de compresión: " + huffman.compressionRatio().ToString());
+                            Console.WriteLine("-Factor de compresión: " + huffman.compressionFactor().ToString());
+                            Console.WriteLine("-Porcentaje ahorrado: " + huffman.savingPercentage().ToString() + "%\n\n");
                             break;
                         case "-d":
                             RLE.decompression(filePath);

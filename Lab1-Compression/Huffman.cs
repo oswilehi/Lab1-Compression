@@ -13,9 +13,11 @@ namespace Lab1_Compression
         /// Atributes
         /// </summary>
         private HuffmanNode root;
-        private int fileSize;
+        public int sizeOriginalSize;
+        public int sizeCompressedFile;
         private Dictionary<char, int> frequencies;
         private int lengthOfPrefixCodes;
+        
         /// <summary>
         /// Constructor
         /// </summary>
@@ -24,7 +26,7 @@ namespace Lab1_Compression
         {
             root = null;
             frequencies = new Dictionary<char, int>();
-           
+            sizeOriginalSize = 0;
 
         }
         public void Compression(string filePath)
@@ -84,6 +86,7 @@ namespace Lab1_Compression
                     }
 
                 }
+                sizeCompressedFile = (int)outputFile.Length;
             }
         }
         /// <summary>
@@ -97,7 +100,7 @@ namespace Lab1_Compression
                 using (var binaryFile = new BinaryReader(file))
                 {
                     var bytes = binaryFile.ReadBytes((int)file.Length);
-                    fileSize = (int)file.Length;
+                    sizeOriginalSize = (int)file.Length;
                     for (int i = 0; i < bytes.Length; i++)
                     {
                         if (!frequencies.ContainsKey((char)bytes[i]))
@@ -147,7 +150,7 @@ namespace Lab1_Compression
         private double GetProbability(int value)
         {
             double v = value;
-            double s = fileSize;
+            double s = sizeOriginalSize;
             return v / s;
         }
         /// <summary>
@@ -236,6 +239,39 @@ namespace Lab1_Compression
                     }
             }
 
+        }
+
+        /// <summary>
+        /// Gives the ratio of compression
+        /// </summary>
+        /// <returns></returns>
+        public double compressionRatio()
+        {
+            double sizeAfter = sizeCompressedFile;
+            double sizeBefore = sizeOriginalSize;
+            return sizeAfter / sizeBefore;
+        }
+
+        /// <summary>
+        /// Gives the compression factor
+        /// </summary>
+        /// <returns></returns>
+        public double compressionFactor()
+        {
+            double sizeAfter = sizeCompressedFile;
+            double sizeBefore = sizeOriginalSize;
+            return sizeBefore / sizeAfter;
+        }
+
+        /// <summary>
+        /// Gives the saving percentage
+        /// </summary>
+        /// <returns></returns>
+        public double savingPercentage()
+        {
+            int sizeAfter = sizeCompressedFile;
+            int sizeBefore = sizeOriginalSize;
+            return (sizeBefore - sizeAfter) / sizeBefore * 100;
         }
 
     }

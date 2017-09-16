@@ -46,6 +46,7 @@ namespace Lab1_Compression
                                     writer.Write(counterOfEqualsInChar);
                                     writer.Write(bytes[i]);
                                     counterOfEquals = 1;
+                                    sizeCompressedFile = (int)outputFile.Length;
                                 }
                             }
 
@@ -106,7 +107,7 @@ namespace Lab1_Compression
         {
             double sizeAfter = sizeCompressedFile;
             double sizeBefore = sizeOriginalSize;
-            return sizeAfter / sizeBefore;
+            return Math.Round(sizeAfter / sizeBefore, 2);
         }
 
         /// <summary>
@@ -117,7 +118,7 @@ namespace Lab1_Compression
         {
             double sizeAfter = sizeCompressedFile;
             double sizeBefore = sizeOriginalSize;
-            return sizeBefore / sizeAfter;
+            return Math.Round( sizeBefore / sizeAfter, 2);
         }
 
         /// <summary>
@@ -126,9 +127,9 @@ namespace Lab1_Compression
         /// <returns></returns>
         public static double savingPercentage()
         {
-            int sizeAfter = sizeCompressedFile;
-            int sizeBefore = sizeOriginalSize;
-            return (sizeBefore - sizeAfter) / sizeBefore * 100;
+            double sizeAfter = sizeCompressedFile;
+            double sizeBefore = sizeOriginalSize;
+            return Math.Round((sizeBefore - sizeAfter) / sizeBefore * 100, 2);
         }
 
 

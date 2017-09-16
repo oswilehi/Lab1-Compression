@@ -17,6 +17,7 @@ namespace Lab1_Compression
             Huffman huffman;
             while (exit)
             {
+                exit = true;
                 Console.WriteLine("Para realizar la compresión con el algoritmo huffman escriba 1 o 0 para el RLE después del comando '-c'.\nSin espacios de por medio; ejemplo: -c1");
                 Console.WriteLine("c:/rle>rle.exe");
                 Console.SetCursorPosition(15, Console.CursorTop - 1);
@@ -43,10 +44,15 @@ namespace Lab1_Compression
                             break;
                         case "-c1":
                             huffman = new Huffman();
-                            huffman.ReadFrequencies(filePath); // Este es el que comprime
+                            huffman.Compression(filePath); // Este es el que comprime
+                            Console.WriteLine("\nEstadísticas del archivo generado con Huffman:");
+                            Console.WriteLine("-Tamaño original: " + huffman.sizeOriginalSize);
+                            Console.WriteLine("-Tamaño final: " + huffman.sizeCompressedFile);
+                            Console.WriteLine("-Ratio de compresión: " + huffman.compressionRatio().ToString());
+                            Console.WriteLine("-Factor de compresión: " + huffman.compressionFactor().ToString());
+                            Console.WriteLine("-Porcentaje ahorrado: " + huffman.savingPercentage().ToString() + "%\n\n");
                             messageC();
-                            Console.WriteLine("\nEstadísticas del archivo generado:");
-                            Console.WriteLine("\n\n");
+                            
                             break;
                         case "-d":
                             StreamReader reader = new StreamReader(filePath);
@@ -73,33 +79,41 @@ namespace Lab1_Compression
                     }
                 }
 
-                exit = true;
+                
             }
-            Console.ReadLine();
         }
         //validar entrada, comandos y la ruta del archivo
         static bool Validation(string entry, ref string filePath, ref string type)
         {
             string[] current = entry.Split(' ');
-            if (!(current.Length > 2))
+            if (current[0].ToLower() == "exit")
             {
-                if (!(current[0] == "-c0" || current[0] == "-d" || current[0] == "-c1"))
-                    return false;
-                type = current[0];
-                string[] path = current[1].Split('"');
-                if (!(path.Length > 3))
+                type = "exit";
+                return true;
+            }
+            else
+            {
+                if (!(current.Length > 2))
                 {
-                    if (!(path[0] == "-f" && File.Exists(path[1])))
+                    if (!(current[0] == "-c0" || current[0] == "-d" || current[0] == "-c1"))
                         return false;
-                    filePath = path[1];
+                    type = current[0];
+                    string[] path = current[1].Split('"');
+                    if (!(path.Length > 3))
+                    {
+                        if (!(path[0] == "-f" && File.Exists(path[1])))
+                            return false;
+                        filePath = path[1];
+                    }
+                    else
+                        return false;
+                    return true;
+
                 }
                 else
                     return false;
-                return true;
-
             }
-            else
-                return false;
+            
         }
         //Mensajes de operación exitosa
         static void messageC()

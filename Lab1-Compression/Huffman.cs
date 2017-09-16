@@ -13,7 +13,9 @@ namespace Lab1_Compression
         /// Atributes
         /// </summary>
         private HuffmanNode root;
-        private int fileSize;
+        public int sizeOriginalSize;
+        
+        public int sizeCompressedFile;
         private Dictionary<char, int> frequencies;
         private int lengthOfPrefixCodes;
         /// <summary>
@@ -24,15 +26,25 @@ namespace Lab1_Compression
         {
             root = null;
             frequencies = new Dictionary<char, int>();
-
+            sizeCompressedFile = 0;
+            sizeOriginalSize = 0;
 
         }
+        /// <summary>
+        /// Method to start the process to compress the file
+        /// </summary>
+        /// <param name="path"></param>
+        public void Compression(string path)
+        {
+            ReadFrequencies(path);
+        }
+
         /// <summary>
         /// Method to compress file
         /// </summary>
         /// <param name="filepath">File path</param>
         /// <param name="bytes">File byte array</param>
-        public void compression(string filepath, byte[] bytes)
+        private void compression(string filepath, byte[] bytes)
         {
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.GetFileNameWithoutExtension(filepath) + ".comp");
             StreamWriter file = new StreamWriter(path);
@@ -78,7 +90,7 @@ namespace Lab1_Compression
                         byte bits = (byte)int.Parse(bit.ToString());
                         writer.Write(bits);
                     }
-
+                    sizeCompressedFile = (int)outputFile.Length;
                 }
             }
         }
@@ -86,14 +98,14 @@ namespace Lab1_Compression
         /// Creat a dictionary (char,int) with the frequencies of each character
         /// </summary>
         /// <param name="filepath"></param>
-        public void ReadFrequencies(string filepath)
+        private void ReadFrequencies(string filepath)
         {
             using (var file = new FileStream(filepath, FileMode.Open))
             {
                 using (var binaryFile = new BinaryReader(file))
                 {
                     var bytes = binaryFile.ReadBytes((int)file.Length);
-                    fileSize = (int)file.Length;
+                    sizeOriginalSize = (int)file.Length;
                     for (int i = 0; i < bytes.Length; i++)
                     {
                         if (!frequencies.ContainsKey((char)bytes[i]))
@@ -143,7 +155,7 @@ namespace Lab1_Compression
         private double GetProbability(int value)
         {
             double v = value;
-            double s = fileSize;
+            double s = sizeOriginalSize;
             return v / s;
         }
         /// <summary>
@@ -232,6 +244,39 @@ namespace Lab1_Compression
                     }
             }
 
+        }
+
+        /// <summary>
+        /// Gives the ratio of compression
+        /// </summary>
+        /// <returns></returns>
+        public double compressionRatio()
+        {
+            double sizeAfter = sizeCompressedFile;
+            double sizeBefore = sizeOriginalSize;
+            return Math .Round(sizeAfter / sizeBefore,2);
+        }
+
+        /// <summary>
+        /// Gives the compression factor
+        /// </summary>
+        /// <returns></returns>
+        public double compressionFactor()
+        {
+            double sizeAfter = sizeCompressedFile;
+            double sizeBefore = sizeOriginalSize;
+            return Math.Round(sizeBefore / sizeAfter,2 );
+        }
+
+        /// <summary>
+        /// Gives the saving percentage
+        /// </summary>
+        /// <returns></returns>
+        public double savingPercentage()
+        {
+            double sizeAfter = sizeCompressedFile;
+            double sizeBefore = sizeOriginalSize;
+            return Math.Round((sizeBefore - sizeAfter) / sizeBefore * 100,2);
         }
 
     }

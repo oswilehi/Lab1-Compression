@@ -38,7 +38,7 @@ namespace Lab1_Compression
                         else
                         {
                             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.GetFileNameWithoutExtension(pathFileToCompress));
-                            using (var outputFile = new FileStream(path + ".comp", FileMode.Append))
+                            using (var outputFile = new FileStream(path +".comp", FileMode.Append))
                             {
                                 using (var writer = new BinaryWriter(outputFile, Encoding.ASCII))
                                 {

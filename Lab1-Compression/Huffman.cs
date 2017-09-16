@@ -60,7 +60,7 @@ namespace Lab1_Compression
             file.WriteLine();
             file.Flush();
             file.Close();
-            using (var outputFile = new FileStream(path, FileMode.Append))
+            using (var outputFile = new FileStream(path + ".comp", FileMode.Append))
             {
                 using (var writer = new BinaryWriter(outputFile, Encoding.ASCII))
                 {

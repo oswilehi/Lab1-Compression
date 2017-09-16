@@ -41,7 +41,7 @@ namespace Lab1_Compression
         /// <param name="bytes">File byte array</param>
         private void compression(string filepath, byte[] bytes)
         {
-            StreamWriter file = new StreamWriter("C:\\Users\\Oscar\\Desktop\\LAB1.txt" + ".comp");
+            StreamWriter file = new StreamWriter(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.GetFileNameWithoutExtension(filepath)) + ".comp");
             file.WriteLine("1," + Path.GetFileName(filepath));
             Dictionary<byte, string> encode = PrefixCode();
             foreach (KeyValuePair<byte, string> item in encode)
@@ -54,7 +54,9 @@ namespace Lab1_Compression
             file.WriteLine();
             file.Flush();
             file.Close();
-            using (var outputFile = new FileStream("C:\\Users\\Oscar\\Desktop\\LAB1.txt" + ".comp", FileMode.Append))
+            string outPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), Path.GetFileNameWithoutExtension(filepath) + ".comp");
+           
+            using (var outputFile = new FileStream(outPath, FileMode.Append))
             {
                 using (var writer = new BinaryWriter(outputFile, Encoding.ASCII))
                 {
@@ -84,9 +86,10 @@ namespace Lab1_Compression
                         byte bits = (byte)int.Parse(bit.ToString());
                         writer.Write(bits);
                     }
-
+                    sizeCompressedFile = (int)outputFile.Length;
+                   
                 }
-                sizeCompressedFile = (int)outputFile.Length;
+               
             }
         }
         /// <summary>
@@ -202,7 +205,7 @@ namespace Lab1_Compression
                 string prefix = valueAndPrefix[1];
                 prefijos[prefix] = value;
             }
-
+            
             reader.Close();
 
             using (var file = new FileStream(path, FileMode.Open))
@@ -269,8 +272,8 @@ namespace Lab1_Compression
         /// <returns></returns>
         public double savingPercentage()
         {
-            int sizeAfter = sizeCompressedFile;
-            int sizeBefore = sizeOriginalSize;
+            double sizeAfter = sizeCompressedFile;
+            double sizeBefore = sizeOriginalSize;
             return (sizeBefore - sizeAfter) / sizeBefore * 100;
         }
 

@@ -46,6 +46,7 @@ namespace Lab1_Compression
                                     writer.Write(counterOfEqualsInChar);
                                     writer.Write(bytes[i]);
                                     counterOfEquals = 1;
+                                    sizeCompressedFile = (int)outputFile.Length;
                                 }
                             }
 
@@ -70,7 +71,6 @@ namespace Lab1_Compression
             reader1.Close();
             using (var file = new FileStream(filepath, FileMode.Open))
             {
-                sizeCompressedFile = (int)file.Length;
                 using (var currentFile = new BinaryReader(file))
                 {
                     var bytes = currentFile.ReadBytes((int)file.Length);
@@ -102,10 +102,10 @@ namespace Lab1_Compression
         /// Gives the ratio of compression
         /// </summary>
         /// <returns></returns>
-        public static int compressionRatio()
+        public static double compressionRatio()
         {
-            int sizeAfter = sizeCompressedFile;
-            int sizeBefore = sizeOriginalSize;
+            double sizeAfter = sizeCompressedFile;
+            double sizeBefore = sizeOriginalSize;
             return sizeAfter / sizeBefore;
         }
 
@@ -113,10 +113,10 @@ namespace Lab1_Compression
         /// Gives the compression factor
         /// </summary>
         /// <returns></returns>
-        public static int compressionFactor()
+        public static double compressionFactor()
         {
-            int sizeAfter = sizeCompressedFile;
-            int sizeBefore = sizeOriginalSize;
+            double sizeAfter = sizeCompressedFile;
+            double sizeBefore = sizeOriginalSize;
             return sizeBefore / sizeAfter;
         }
 
@@ -126,8 +126,8 @@ namespace Lab1_Compression
         /// <returns></returns>
         public static double savingPercentage()
         {
-            int sizeAfter = sizeCompressedFile;
-            int sizeBefore = sizeOriginalSize;
+            double sizeAfter = sizeCompressedFile;
+            double  sizeBefore = sizeOriginalSize;
             return (sizeBefore - sizeAfter) / sizeBefore * 100;
         }
 

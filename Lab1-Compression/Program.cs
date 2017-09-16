@@ -17,6 +17,7 @@ namespace Lab1_Compression
             Huffman huffman = new Huffman();
             while (exit)
             {
+                exit = true;
                 Console.WriteLine("Para realizar la compresión con el algoritmo huffman escriba 1 o 0 para el RLE después del comando '-c'.\nSin espacios de por medio; ejemplo: -c1");
                 Console.WriteLine("c:/rle>rle.exe");
                 Console.SetCursorPosition(15, Console.CursorTop - 1);
@@ -52,12 +53,20 @@ namespace Lab1_Compression
                             Console.WriteLine("-Porcentaje ahorrado: " + huffman.savingPercentage().ToString() + "%\n\n");
                             break;
                         case "-d":
-                            RLE.decompression(filePath);
-                            huffman.Decompress(filePath);
+                            string x = typeDecompression(filePath);
+                            if (x == "0")
+                                RLE.decompression(filePath);
+                            else
+                                huffman.Decompress(filePath);
                             messageD();
                             break;
                         case "exit":
                             exit = false;
+                            break;
+                        case "f":
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("¡Error! Asegúrese de colocar la ruta del archivo correcto.");
+                            Console.ForegroundColor = ConsoleColor.White;
                             break;
                         default:
                             Console.WriteLine("Si desea dejar de usar el programa escriba 'exit'");
@@ -65,34 +74,42 @@ namespace Lab1_Compression
                             break;
                     }
                 }
-
-                exit = true;
+                               
             }
-            Console.ReadLine();
+           
         }
         //validar entrada, comandos y la ruta del archivo
         static bool Validation(string entry, ref string filePath, ref string type)
         {
             string[] current = entry.Split(' ');
-            if (!(current.Length > 2))
+            if (current[0].ToLower() == "exit")
             {
-                if (!(current[0] == "-c0" || current[0] == "-d" || current[0] == "-c1"))
-                    return false;
-                type = current[0];
-                string[] path = current[1].Split('"');
-                if (!(path.Length > 3))
+                type = "exit";
+                return true;
+            }
+            else
+            {
+                if (!(current.Length > 2))
                 {
-                    if (!(path[0] == "-f" && File.Exists(path[1])))
+                    if (!(current[0] == "-c0" || current[0] == "-d" || current[0] == "-c1"))
                         return false;
-                    filePath = path[1];
+                    type = current[0];
+                    string[] path = current[1].Split('"');
+                    if (!(path.Length > 3))
+                    {
+                        if (!(path[0] == "-f" && File.Exists(path[1])))
+                            return false;
+                        filePath = path[1];
+                    }
+                    else
+                        return false;
+                    return true;
+
                 }
                 else
                     return false;
-                return true;
-
             }
-            else
-                return false;
+            
         }
         //Mensajes de operación exitosa
         static void messageC()
@@ -106,6 +123,26 @@ namespace Lab1_Compression
             Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("Decompresión finalizada exitosamente.\n\n");
             Console.ForegroundColor = ConsoleColor.White;
+        }
+        static string typeDecompression(string path)
+        {
+            try
+            {
+                StreamReader r = new StreamReader(path);
+                string line = r.ReadLine();
+                r.Close();
+                string[] split = line.Split(',');
+                if (split[0] == "1" || split[0] == "0")
+                    return split[0];
+                else
+                    return "f";
+            }
+            catch (Exception)
+            {
+                
+                return "f";
+            }
+           
         }
 
     }

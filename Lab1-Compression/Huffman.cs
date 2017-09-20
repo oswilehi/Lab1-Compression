@@ -52,15 +52,22 @@ namespace Lab1_Compression
             Dictionary<char, string> encode = PrefixCode();
             foreach (KeyValuePair<char, string> item in encode)
             {
-                file.Write((byte)item.Key);
-                file.Write('-');
+                if (item.Key == '\r') //salto de línea
+                    file.Write('-');
+                else if (item.Key == '\n')//enter
+                    file.Write('+');
+                else
+                    file.Write(item.Key);
+
+                // file.Write('-'); le quité este separador para ahorrar espacio
+               
                 file.Write(item.Value);
                 file.Write('|');
             }
             file.WriteLine();
             file.Flush();
             file.Close();
-            using (var outputFile = new FileStream(path + ".comp", FileMode.Append))
+            using (var outputFile = new FileStream(path, FileMode.Append))
             {
                 using (var writer = new BinaryWriter(outputFile, Encoding.ASCII))
                 {

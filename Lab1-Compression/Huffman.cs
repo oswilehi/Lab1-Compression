@@ -14,7 +14,7 @@ namespace Lab1_Compression
         /// </summary>
         private HuffmanNode root;
         public int sizeOriginalSize;
-        
+
         public int sizeCompressedFile;
         private Dictionary<char, int> frequencies;
         private int lengthOfPrefixCodes;
@@ -53,14 +53,15 @@ namespace Lab1_Compression
             foreach (KeyValuePair<char, string> item in encode)
             {
                 if (item.Key == '\r') //salto de línea
-                    file.Write('-');
+                    file.Write("13"); // No le podes poner una + o un -, imaginate que venga ese simbolo en la imagen?
                 else if (item.Key == '\n')//enter
-                    file.Write('+');
+                    file.Write("10");
                 else
                     file.Write(item.Key);
 
-                // file.Write('-'); le quité este separador para ahorrar espacio
-               
+                file.Write('-');
+
+
                 file.Write(item.Value);
                 file.Write('|');
             }
@@ -194,7 +195,7 @@ namespace Lab1_Compression
 
         public void Decompress(string path)
         {
-            Dictionary<string, int> prefijos = new Dictionary<string, int>();
+            Dictionary<string, string> prefijos = new Dictionary<string, string>();
             StreamReader reader = new StreamReader(path);
             string firstLine = reader.ReadLine();
             var infoOfFile = firstLine.Split(',');
@@ -210,7 +211,7 @@ namespace Lab1_Compression
             for (int i = 0; i < separatedSecondLine.Length; i++)
             {
                 var valueAndPrefix = separatedSecondLine[i].Split('-');
-                int value = int.Parse(valueAndPrefix[0]);
+                string value = valueAndPrefix[0];
                 string prefix = valueAndPrefix[1];
                 prefijos[prefix] = value;
             }
@@ -236,19 +237,33 @@ namespace Lab1_Compression
             }
 
             string pathToSave = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
-            using (StreamWriter outputFile = new StreamWriter(pathToSave + "\\D" + fileName))
+            using (StreamWriter outputFile = new StreamWriter(pathToSave + fileName))
             {
-                    int start = 0;
-                    for (int i = 0; i <= fileInBinary.Length; i++)
-                    {
+                int start = 0;
+                for (int i = 0; i <= fileInBinary.Length; i++)
+                {
 
-                        if (prefijos.ContainsKey(fileInBinary.Substring(0, i)))
+                    if (prefijos.ContainsKey(fileInBinary.Substring(0, i)))
+                    {
+                        if (prefijos[fileInBinary.Substring(0, i)] == "13")
                         {
-                            outputFile.Write((char)prefijos[fileInBinary.Substring(0, i)]);
+                            fileInBinary = fileInBinary.Remove(start, i);
+                            i = 0;
+                        }                         
+                        else if (prefijos[fileInBinary.Substring(0, i)] == "10")
+                        {
+                            outputFile.Write(Environment.NewLine);
                             fileInBinary = fileInBinary.Remove(start, i);
                             i = 0;
                         }
+                        else
+                        {
+                            outputFile.Write(prefijos[fileInBinary.Substring(0, i)]);
+                            fileInBinary = fileInBinary.Remove(start, i);
+                            i = 0;
+                        }                  
                     }
+                }
             }
 
         }
@@ -261,7 +276,7 @@ namespace Lab1_Compression
         {
             double sizeAfter = sizeCompressedFile;
             double sizeBefore = sizeOriginalSize;
-            return Math .Round(sizeAfter / sizeBefore,2);
+            return Math.Round(sizeAfter / sizeBefore, 2);
         }
 
         /// <summary>
@@ -272,7 +287,7 @@ namespace Lab1_Compression
         {
             double sizeAfter = sizeCompressedFile;
             double sizeBefore = sizeOriginalSize;
-            return Math.Round(sizeBefore / sizeAfter,2 );
+            return Math.Round(sizeBefore / sizeAfter, 2);
         }
 
         /// <summary>
@@ -283,7 +298,7 @@ namespace Lab1_Compression
         {
             double sizeAfter = sizeCompressedFile;
             double sizeBefore = sizeOriginalSize;
-            return Math.Round((sizeBefore - sizeAfter) / sizeBefore * 100,2);
+            return Math.Round((sizeBefore - sizeAfter) / sizeBefore * 100, 2);
         }
 
     }

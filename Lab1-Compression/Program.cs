@@ -18,7 +18,8 @@ namespace Lab1_Compression
             while (exit)
             {
                 exit = true;
-                Console.WriteLine("Para realizar la compresión con el algoritmo huffman escriba 1 o 0 para el RLE después del comando '-c'.\nSin espacios de por medio; ejemplo: -c1");
+                Console.WriteLine("Para realizar la compresión con el algoritmo huffman escriba 1 o 0 para el RLE después del comando '-c'.\nSin espacios de por medio; ejemplo: -c1 -f" + '"' + "RUTA ARCHIVO" + '"');
+                Console.WriteLine("Para descomprimir escriba: -d -f" + '"' + "RUTA ARCHIVO" + '"');
                 Console.WriteLine("c:/rle>rle.exe");
                 Console.SetCursorPosition(15, Console.CursorTop - 1);
                 entry = Console.ReadLine();

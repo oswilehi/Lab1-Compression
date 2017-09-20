@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lab1_Compression
+namespace CompressionLibrary
 {
-    class HuffmanNode
+   public class HuffmanNode
     {
         //Atributes
         public double probability { get; set; } //probabilidad de repetirse dentro del documento 

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lab1_Compression
+namespace CompressionLibrary
 {
-    class HuffmanQueue<HuffmanNode>
+    public class HuffmanQueue<HuffmanNode>
     {
         //Atributes
         private SortedDictionary<double, Queue<HuffmanNode>> sortedCharactersDictionary = new SortedDictionary<double, Queue<HuffmanNode>>(); //este diccionario contendrá las probabilidades y por cada probabilidad una cola de los caracteres que repiten esa probabilidad

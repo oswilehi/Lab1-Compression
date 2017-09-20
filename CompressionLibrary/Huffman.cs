@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace Lab1_Compression
+namespace CompressionLibrary
 {
-    class Huffman
+   public class Huffman
     {
         /// <summary>
         /// Atributes

@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace Lab1_Compression
+namespace CompressionLibrary
 {
-    class RLE
+   public class RLE
     {
         public static int sizeCompressedFile { get; set; }
         public static int sizeOriginalSize { get; set; }

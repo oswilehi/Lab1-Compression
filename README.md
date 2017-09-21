@@ -2,7 +2,7 @@
 
 Integrantes: <br /> 
 OSCAR WINSTON LEMUS HIGUEROS #1194216 <br />
-JACKELINNE NOHEMY SALAZAR COUTIÑO # <br />
+JACKELINNE NOHEMY SALAZAR COUTIÑO #1210216 <br />
 
 El laboratorio es el proyecto llamado "Lab1-Compression", en la primera carpeta solo están las clases utilizadas para comprimir. <br />
 

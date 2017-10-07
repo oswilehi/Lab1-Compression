@@ -15,7 +15,7 @@ namespace Lab1_Compression
         private HuffmanNode root;
         public int sizeOriginalSize;
         public int sizeCompressedFile;
-        private Dictionary<char, int> frequencies;
+        private Dictionary<byte, int> frequencies; //antes era char-int
         private int lengthOfPrefixCodes;
         
         /// <summary>
@@ -25,7 +25,7 @@ namespace Lab1_Compression
         public Huffman()
         {
             root = null;
-            frequencies = new Dictionary<char, int>();
+            frequencies = new Dictionary<byte, int>();
             sizeOriginalSize = 0;
 
         }
@@ -46,7 +46,7 @@ namespace Lab1_Compression
             Dictionary<byte, string> encode = PrefixCode();
             foreach (KeyValuePair<byte, string> item in encode)
             {
-                file.Write((byte)item.Key);
+                file.Write(item.Key);
                 file.Write('-');
                 file.Write(item.Value);
                 file.Write('|');
@@ -63,28 +63,29 @@ namespace Lab1_Compression
                     string pivot = "";
                     for (int i = 0; i < bytes.Length; i++)
                     {
-                        pivot += encode[bytes[i]];
+                       pivot += encode[bytes[i]]; // no convertirlo a string
+
                     }
-                    lengthOfPrefixCodes = pivot.Length;
+                    lengthOfPrefixCodes = bytes.Length;
                     var bit = 0;
 
-                    for (int i = 0; i < pivot.Length; i++)
+                    for (int i = 0; i < bytes.Length; i++)
                     {
-                        if (pivot.Length - i >= 8)
-                        {
-                            string current = pivot.Substring(i, 8);
-                            bit = Convert.ToInt16(current, 2);
-                            i = i + 7;
-                        }
-                        else
-                        {
-                            string current = pivot.Substring(i, (pivot.Length % 8));
-                            bit = Convert.ToInt16(current, 2);
-                            i = pivot.Length;
-                        }
-
+                         if (pivot.Length - i >= 8)
+                         {
+                             string current = pivot.Substring(i, 8);
+                             bit = Convert.ToInt16(current, 2);
+                             i = i + 7;
+                         }
+                         else
+                         {
+                             string current = pivot.Substring(i, (pivot.Length % 8));
+                             bit = Convert.ToInt16(current, 2);
+                             i = pivot.Length;
+                         }
                         byte bits = (byte)int.Parse(bit.ToString());
                         writer.Write(bits);
+
                     }
                     sizeCompressedFile = (int)outputFile.Length;
                    
@@ -106,9 +107,9 @@ namespace Lab1_Compression
                     sizeOriginalSize = (int)file.Length;
                     for (int i = 0; i < bytes.Length; i++)
                     {
-                        if (!frequencies.ContainsKey((char)bytes[i]))
-                            frequencies.Add((char)bytes[i], 0);
-                        frequencies[(char)bytes[i]]++;
+                        if (!frequencies.ContainsKey(bytes[i]))
+                            frequencies.Add(bytes[i], 0);
+                        frequencies[bytes[i]]++;
 
                     }
                     HuffmanTree(frequencies);
@@ -130,11 +131,11 @@ namespace Lab1_Compression
         /// Creat Huffman tree 
         /// </summary>
         /// <param name="frequencies">Dictionary of frequencies</param>
-        private void HuffmanTree(IEnumerable<KeyValuePair<char, int>> frequencies)
+        private void HuffmanTree(IEnumerable<KeyValuePair<byte, int>> frequencies)
         {
             HuffmanQueue<HuffmanNode> priorityQueue = new HuffmanQueue<HuffmanNode>();
 
-            foreach (KeyValuePair<char, int> item in frequencies)
+            foreach (KeyValuePair<byte, int> item in frequencies)
             {
                 priorityQueue.Queue(new HuffmanNode { value = item.Key, probability = GetProbability(item.Value) }, GetProbability(item.Value));
             }
@@ -236,6 +237,7 @@ namespace Lab1_Compression
                         if (prefijos.ContainsKey(fileInBinary.Substring(0, i)))
                         {
                             outputFile.Write((char)prefijos[fileInBinary.Substring(0, i)]);
+                            
                             fileInBinary = fileInBinary.Remove(start, i);
                             i = 0;
                         }
